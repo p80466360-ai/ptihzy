@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PATIH BUG PANEL</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #080808;
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
+header {
+    background: #b90000;
+    padding: 22px;
+    text-align: center;
+    font-size: 23px;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+.container {
+    padding: 18px;
+}
+
+.card {
+    background: #171717;
+    border: 1px solid #a00000;
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 18px;
+}
+
+h3 {
+    color: #ff3030;
+}
+
+input {
+    width: 100%;
+    padding: 13px;
+    background: #090909;
+    border: 1px solid #555;
+    border-radius: 8px;
+    color: white;
+    margin: 10px 0;
+    outline: none;
+}
+
+button {
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 8px;
+    background: #d00000;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:active {
+    background: #800000;
+}
+
+.result {
+    margin-top: 12px;
+    color: #00ff88;
+    overflow-wrap: anywhere;
+}
+
+.history {
+    font-size: 13px;
+    color: #bbb;
+    padding: 8px;
+    border-bottom: 1px solid #333;
+}
+
+footer {
+    text-align: center;
+    color: #666;
+    padding: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<header>PATIH BUG PANEL</header>
+
+<div class="container">
+
+<div class="card">
+<h3>NUMBER CHECKER</h3>
+
+<input type="text" id="number"
+placeholder="Masukkan nomor HP (08...)">
+
+<button onclick="checkNumber()">
+CHECK NUMBER
+</button>
+
+<div class="result" id="result"></div>
+</div>
+
+<div class="card">
+<h3>DELAY TIMER</h3>
+
+<input type="number" id="delay"
+placeholder="Masukkan delay (detik)" min="1">
+
+<button onclick="startTimer()">
+START TIMER
+</button>
+
+<div class="result" id="timerResult"></div>
+</div>
+
+<div class="card">
+<h3>NUMBER HISTORY</h3>
+
+<div id="history"></div>
+
+<br>
+
+<button onclick="clearHistory()">
+CLEAR HISTORY
+</button>
+</div>
+
+</div>
+
+<footer>
+PATIH BUG PANEL © 2026
+</footer>
+
+<script>
+
+let historyData = JSON.parse(
+localStorage.getItem("patihHistory") || "[]"
+);
+
+function renderHistory() {
+    document.getElementById("history").innerHTML =
+    historyData.map(item =>
+        `<div class="history">${item}</div>`
+    ).join("");
+}
+
+function checkNumber() {
+
+    let number = document.getElementById("number").value.trim();
+    let result = document.getElementById("result");
+
+    if (!/^08[0-9]{8,11}$/.test(number)) {
+        result.style.color = "red";
+        result.innerText = "Format nomor tidak valid!";
+        return;
+    }
+
+    result.style.color = "#00ff88";
+    result.innerText = "Format nomor valid!";
+
+    historyData.unshift(number);
+
+    historyData = historyData.slice(0, 20);
+
+    localStorage.setItem(
+        "patihHistory",
+        JSON.stringify(historyData)
+    );
+
+    renderHistory();
+}
+
+let timerInterval;
+
+function startTimer() {
+
+    clearInterval(timerInterval);
+
+    let seconds = parseInt(
+        document.getElementById("delay").value
+    );
+
+    let output = document.getElementById("timerResult");
+
+    if (!Number.isInteger(seconds) || seconds < 1) {
+        output.innerText = "Masukkan delay yang valid!";
+        return;
+    }
+
+    let remaining = seconds;
+
+    output.innerText = "Delay: " + remaining + " detik";
+
+    timerInterval = setInterval(() => {
+
+        remaining--;
+
+        if (remaining <= 0) {
+            clearInterval(timerInterval);
+            output.innerText = "Timer selesai!";
+        } else {
+            output.innerText =
+            "Delay: " + remaining + " detik";
+        }
+
+    }, 1000);
+}
+
+function clearHistory() {
+    historyData = [];
+    localStorage.removeItem("patihHistory");
+    renderHistory();
+}
+
+renderHistory();
+
+</script>
+
+</body>
+</html>
